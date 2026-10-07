@@ -1342,7 +1342,7 @@ async function loadHydration() {
 async function setHydration(count) {
   const { error } = await db
     .from('hydration')
-    .upsert({ user_id: state.user.id, day: dayISO(), taps: count });
+    .upsert({ user_id: state.user.id, day: dayISO(), taps: count }, { onConflict: 'user_id,day' });
   if (error) { toast('HYDRATION LOG FAILED — ' + error.message.toUpperCase()); return; }
   loadHydration();
 }
@@ -1373,7 +1373,9 @@ function renderSleep(hours) {
 
 async function logSleep() {
   const hours = Number($('sleep-slider').value);
-  const { error } = await db.from('sleep_logs').upsert({ user_id: state.user.id, day: dayISO(), hours });
+  const { error } = await db
+    .from('sleep_logs')
+    .upsert({ user_id: state.user.id, day: dayISO(), hours }, { onConflict: 'user_id,day' });
   if (error) { toast('SLEEP LOG FAILED — ' + error.message.toUpperCase()); return; }
   toast('SLEEP LOGGED. RECOVERY COUNTS AS TRAINING.');
   renderSleep(hours);

@@ -12,7 +12,6 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 const AVATARS = ['💪', '🏋️', '🥊', '🏃', '🚴', '🧗', '🦍', '⚡', '🔥', '🐺', '🦅', '🐐'];
-const WEEK_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const state = {
   user: null,
@@ -75,10 +74,10 @@ function formatLogDate(iso) {
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
   const sameDay = (a, b) => a.toDateString() === b.toDateString();
-  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  if (sameDay(d, today)) return `Today · ${time}`;
-  if (sameDay(d, yesterday)) return `Yesterday · ${time}`;
-  return `${WEEK_LABELS[(d.getDay() + 6) % 7]} · ${d.toLocaleDateString([], { day: 'numeric', month: 'short' })} · ${time}`;
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toUpperCase();
+  if (sameDay(d, today)) return `TODAY — ${time}`;
+  if (sameDay(d, yesterday)) return `YESTERDAY — ${time}`;
+  return `${d.toLocaleDateString([], { day: '2-digit', month: 'short' }).toUpperCase()} — ${time}`;
 }
 
 function metricLine(w) {
@@ -185,15 +184,15 @@ function setAuthMode(mode) {
   const isLogin = mode === 'login';
   if (isLogin) {
     hide('signup-only');
-    $('tab-btn-login').className = 'auth-toggle flex-1 py-2.5 rounded-lg text-sm font-bold bg-volt text-ink transition';
-    $('tab-btn-signup').className = 'auth-toggle flex-1 py-2.5 rounded-lg text-sm font-bold text-zinc-400 transition';
-    $('auth-submit').textContent = 'LOG IN';
+    $('tab-btn-login').className = 'auth-toggle py-3.5 font-display uppercase tracking-widest text-xs bg-volt text-ink font-bold active:translate-y-0.5 transition duration-75';
+    $('tab-btn-signup').className = 'auth-toggle py-3.5 font-display uppercase tracking-widest text-xs border-l border-zinc-800 text-zinc-500 hover:text-zinc-300 active:translate-y-0.5 transition duration-75';
+    $('auth-submit').textContent = 'ACCESS';
     $('auth-password').setAttribute('autocomplete', 'current-password');
   } else {
     show('signup-only');
-    $('tab-btn-login').className = 'auth-toggle flex-1 py-2.5 rounded-lg text-sm font-bold text-zinc-400 transition';
-    $('tab-btn-signup').className = 'auth-toggle flex-1 py-2.5 rounded-lg text-sm font-bold bg-volt text-ink transition';
-    $('auth-submit').textContent = 'CREATE ACCOUNT';
+    $('tab-btn-login').className = 'auth-toggle py-3.5 font-display uppercase tracking-widest text-xs text-zinc-500 hover:text-zinc-300 active:translate-y-0.5 transition duration-75';
+    $('tab-btn-signup').className = 'auth-toggle py-3.5 font-display uppercase tracking-widest text-xs border-l border-zinc-800 bg-volt text-ink font-bold active:translate-y-0.5 transition duration-75';
+    $('auth-submit').textContent = 'ENLIST';
     $('auth-password').setAttribute('autocomplete', 'new-password');
   }
   setError('auth-error', null);
@@ -206,11 +205,11 @@ async function handleAuthSubmit(e) {
   const email = $('auth-email').value.trim();
   const password = $('auth-password').value;
   if (!email || !password) {
-    setError('auth-error', 'Enter your email and password.');
+    setError('auth-error', 'EMAIL + PASSWORD REQUIRED.');
     return;
   }
   if (password.length < 6) {
-    setError('auth-error', 'Password must be at least 6 characters.');
+    setError('auth-error', 'PASSWORD TOO SHORT — MINIMUM 6.');
     return;
   }
 
@@ -224,7 +223,7 @@ async function handleAuthSubmit(e) {
   } else {
     const displayName = $('signup-name').value.trim();
     if (displayName.length < 2) {
-      setError('auth-error', 'Display name must be at least 2 characters.');
+      setError('auth-error', 'CALLSIGN TOO SHORT — MINIMUM 2.');
       btn.disabled = false;
       btn.style.opacity = '1';
       return;
@@ -241,11 +240,11 @@ async function handleAuthSubmit(e) {
       }
     }));
     if (!error) {
-      toast('Account created! Welcome to the crew 💪');
+      toast('ACCOUNT CREATED.');
       // Session may be immediate (email confirmation off) or pending (on).
       const { data } = await db.auth.getSession();
       if (!data.session) {
-        setError('auth-error', 'Check your inbox to confirm your email, then log in.');
+        setError('auth-error', 'CONFIRM YOUR EMAIL VIA THE INBOX LINK, THEN ACCESS.');
       }
     }
   }
@@ -261,7 +260,7 @@ async function signOut() {
     db.removeChannel(realtimeChannel);
     realtimeChannel = null;
   }
-  toast('Signed out. Rest day earned.');
+  toast('SESSION ENDED. BACK TOMORROW.');
 }
 
 /* ---------------- profile setup ---------------- */
@@ -270,8 +269,8 @@ function setSelectedAvatar(emoji) {
   state.selectedAvatar = AVATARS.includes(emoji) ? emoji : AVATARS[0];
   document.querySelectorAll('#avatar-picker button').forEach((btn) => {
     const on = btn.dataset.avatar === state.selectedAvatar;
-    btn.className = `aspect-square rounded-xl text-2xl border transition ${
-      on ? 'border-volt bg-volt/10 scale-105' : 'border-edge bg-ink'
+    btn.className = `aspect-square text-2xl border transition ${
+      on ? 'border-volt bg-volt/10' : 'border-zinc-800 bg-ink'
     }`;
   });
 }
@@ -295,7 +294,7 @@ async function handleSetupSubmit(e) {
 
   const displayName = $('setup-name').value.trim();
   if (displayName.length < 2) {
-    setError('setup-error', 'Display name must be at least 2 characters.');
+    setError('setup-error', 'CALLSIGN TOO SHORT — MINIMUM 2.');
     return;
   }
 
@@ -312,7 +311,7 @@ async function handleSetupSubmit(e) {
     setError('setup-error', error.message);
     return;
   }
-  toast('Profile saved. Let’s go! 🔥');
+  toast('PROFILE UPDATED. GET TO WORK.');
   enterApp();
 }
 
@@ -326,7 +325,8 @@ function switchTab(tab) {
   show(`tab-${tab}`);
   document.querySelectorAll('.nav-btn').forEach((btn) => {
     const active = btn.dataset.tab === tab;
-    btn.classList.toggle('text-volt', active);
+    btn.classList.toggle('bg-volt', active);
+    btn.classList.toggle('text-ink', active);
     btn.classList.toggle('text-zinc-500', !active);
   });
   window.scrollTo(0, 0);
@@ -340,7 +340,7 @@ async function handleLogSubmit(e) {
 
   const exerciseName = $('log-exercise').value.trim();
   if (!exerciseName) {
-    setError('log-error', 'Give the exercise a name first.');
+    setError('log-error', 'NAME THE MOVEMENT FIRST.');
     return;
   }
 
@@ -353,7 +353,7 @@ async function handleLogSubmit(e) {
   const sets = readNum('log-sets');
 
   if ([weight, reps, sets].some((n) => n !== null && (isNaN(n) || n < 0))) {
-    setError('log-error', 'Numbers can’t be negative.');
+    setError('log-error', 'NO NEGATIVE NUMBERS.');
     return;
   }
 
@@ -379,7 +379,7 @@ async function handleLogSubmit(e) {
   }
 
   $('log-form').reset();
-  toast('Session logged! 💥');
+  toast('SESSION REGISTERED.');
   loadHistory();
   loadProfileStats();
 }
@@ -404,7 +404,7 @@ function updateStatLabels() {
   const weekStart = startOfLocalWeek();
   const weekCount = state.workouts.filter((w) => new Date(w.performed_at) >= weekStart).length;
   $('stat-week').textContent = weekCount;
-  $('week-counter').textContent = `${weekCount} this week`;
+  $('week-counter').textContent = `WK ${weekCount}`;
   if (state.workouts.length > 0) $('stat-total').textContent = state.workouts.length;
 }
 
@@ -412,9 +412,12 @@ function renderHistory() {
   const list = $('history-list');
   if (state.workouts.length === 0) {
     list.innerHTML = `
-      <div class="text-center py-12 text-zinc-600">
-        <div class="text-5xl mb-3">🫥</div>
-        <p class="text-sm">No sessions yet. Log your first one above.</p>
+      <div class="border border-zinc-800 bg-panel px-5 py-10 text-center">
+        <p class="font-display uppercase font-semibold tracking-widest text-lg leading-relaxed text-zinc-300">
+          0 SESSIONS LOGGED THIS WEEK.<br/>
+          <span class="text-volt">RESET THE CLOCK.</span>
+        </p>
+        <p class="text-[9px] tracking-[0.3em] uppercase text-zinc-600 mt-4">The board is watching</p>
       </div>`;
     return;
   }
@@ -422,17 +425,17 @@ function renderHistory() {
   list.innerHTML = state.workouts
     .map(
       (w) => `
-      <article class="bg-panel border border-edge rounded-2xl p-4 rise">
+      <article class="bg-panel border border-zinc-800 p-4 rise">
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <h3 class="font-bold text-base truncate">${escapeHtml(w.exercise_name)}</h3>
-            <p class="text-volt text-sm font-bold mt-0.5">${escapeHtml(metricLine(w)) || '&nbsp;'}</p>
-            ${w.notes ? `<p class="text-zinc-400 text-sm mt-2 break-words">${escapeHtml(w.notes)}</p>` : ''}
+            <h3 class="font-display uppercase font-semibold text-lg leading-tight truncate">${escapeHtml(w.exercise_name)}</h3>
+            <p class="text-volt text-[11px] font-bold tracking-[0.2em] uppercase mt-1">${escapeHtml(metricLine(w)) || '&nbsp;'}</p>
+            ${w.notes ? `<p class="text-zinc-400 text-xs mt-2.5 leading-relaxed break-words normal-case">${escapeHtml(w.notes)}</p>` : ''}
           </div>
           <button data-del="${w.id}" aria-label="Delete entry"
-            class="shrink-0 text-zinc-600 hover:text-red-400 text-lg px-2 py-1 transition">✕</button>
+            class="shrink-0 text-[9px] tracking-[0.2em] text-zinc-600 hover:text-red-500 border border-zinc-800 hover:border-red-500 px-2 py-1.5 transition duration-75">DEL</button>
         </div>
-        <p class="text-[11px] text-zinc-600 mt-3">${escapeHtml(formatLogDate(w.performed_at))}</p>
+        <p class="text-[9px] text-zinc-600 mt-3 tracking-[0.25em] uppercase">${escapeHtml(formatLogDate(w.performed_at))}</p>
       </article>`
     )
     .join('');
@@ -445,10 +448,10 @@ function renderHistory() {
 async function deleteWorkout(id) {
   const { error } = await db.from('workouts').delete().eq('id', id);
   if (error) {
-    toast('Could not delete: ' + error.message);
+    toast('DELETE FAILED — ' + error.message);
     return;
   }
-  toast('Entry removed.');
+  toast('ENTRY STRUCK FROM THE LOG.');
   loadHistory();
   loadProfileStats();
   if (state.currentTab === 'leaderboard') loadLeaderboard();
@@ -458,37 +461,40 @@ async function deleteWorkout(id) {
 
 async function loadLeaderboard() {
   const list = $('leaderboard-list');
-  list.innerHTML = `<p class="text-sm text-zinc-500 text-center py-8">Loading crew standings…</p>`;
+  list.innerHTML = `<p class="text-[10px] tracking-[0.3em] uppercase text-zinc-600 text-center py-10">LOADING BOARD…</p>`;
 
   const { data, error } = await db.rpc('get_weekly_leaderboard');
 
   if (error) {
-    list.innerHTML = `<p class="text-sm text-red-400 text-center py-8">${escapeHtml(error.message)}</p>`;
+    list.innerHTML = `<p class="text-[11px] text-red-400 text-center py-10 uppercase tracking-wider">${escapeHtml(error.message)}</p>`;
     return;
   }
 
   const rows = data ?? [];
   if (rows.length === 0) {
-    list.innerHTML = `<p class="text-sm text-zinc-500 text-center py-8">No crew members yet.</p>`;
+    list.innerHTML = `
+      <div class="border border-zinc-800 bg-panel px-5 py-10 text-center">
+        <p class="font-display uppercase font-semibold tracking-widest text-lg text-zinc-300">THE BOARD IS EMPTY.</p>
+        <p class="text-volt font-display uppercase font-semibold tracking-widest text-lg mt-1">BE THE FIRST NAME ON IT.</p>
+      </div>`;
     return;
   }
 
-  const medals = ['🥇', '🥈', '🥉'];
   list.innerHTML = rows
     .map((row, i) => {
       const isMe = row.user_id === state.user.id;
-      const rank = medals[i] ?? `#${i + 1}`;
+      const rank = String(i + 1).padStart(2, '0');
       return `
-      <div class="flex items-center gap-3 bg-panel border ${isMe ? 'border-volt/60' : 'border-edge'} rounded-2xl px-4 py-3 rise">
-        <span class="w-10 text-center font-black ${i < 3 ? 'text-xl' : 'text-zinc-500 text-sm'}">${rank}</span>
-        <span class="text-2xl">${escapeHtml(row.avatar)}</span>
+      <div class="flex items-center gap-3 border ${isMe ? 'border-volt bg-volt/5' : 'border-zinc-800 bg-panel'} px-4 py-3 rise">
+        <span class="w-9 font-display font-bold text-lg ${i < 3 ? 'text-volt' : 'text-zinc-600'}">${rank}</span>
+        <span class="text-xl">${escapeHtml(row.avatar)}</span>
         <div class="min-w-0 flex-1">
-          <p class="font-bold text-sm truncate">${escapeHtml(row.display_name)}${isMe ? ' <span class="text-[10px] text-volt font-black">(YOU)</span>' : ''}</p>
-          <p class="text-[11px] text-zinc-500">${escapeHtml(row.fitness_goal)}</p>
+          <p class="font-display uppercase font-semibold text-sm truncate">${escapeHtml(row.display_name)}${isMe ? ' <span class="text-volt text-[9px] font-mono tracking-widest">/ YOU</span>' : ''}</p>
+          <p class="text-[9px] text-zinc-500 uppercase tracking-[0.25em] mt-0.5">${escapeHtml(row.fitness_goal)}</p>
         </div>
         <div class="text-right">
-          <p class="font-black text-volt">${row.total_workouts}</p>
-          <p class="text-[10px] text-zinc-500 uppercase">sessions</p>
+          <p class="font-display font-bold text-2xl text-volt leading-none">${row.total_workouts}</p>
+          <p class="text-[8px] text-zinc-500 uppercase tracking-[0.25em] mt-1">sessions</p>
         </div>
       </div>`;
     })
@@ -499,7 +505,7 @@ async function loadLeaderboard() {
 
 async function loadChallenges() {
   const list = $('challenges-list');
-  list.innerHTML = `<p class="text-sm text-zinc-500 text-center py-8">Loading challenges…</p>`;
+  list.innerHTML = `<p class="text-[10px] tracking-[0.3em] uppercase text-zinc-600 text-center py-10">LOADING MISSIONS…</p>`;
 
   const [chRes, partRes] = await Promise.all([
     db.from('challenges').select('*').eq('is_active', true).order('created_at', { ascending: true }),
@@ -507,7 +513,7 @@ async function loadChallenges() {
   ]);
 
   if (chRes.error) {
-    list.innerHTML = `<p class="text-sm text-red-400 text-center py-8">${escapeHtml(chRes.error.message)}</p>`;
+    list.innerHTML = `<p class="text-[11px] text-red-400 text-center py-10 uppercase tracking-wider">${escapeHtml(chRes.error.message)}</p>`;
     return;
   }
   state.challenges = chRes.data ?? [];
@@ -540,34 +546,34 @@ function renderChallengeCard(c, mine, joinedCount) {
   const pct = Math.min(100, Math.round((progress / c.target_workouts) * 100));
   const done = progress >= c.target_workouts;
   const endLine = c.ends_at
-    ? `Ends ${new Date(c.ends_at).toLocaleDateString([], { day: 'numeric', month: 'short' })}`
-    : 'Ongoing';
+    ? `CLOSES ${new Date(c.ends_at).toLocaleDateString([], { day: '2-digit', month: 'short' }).toUpperCase()}`
+    : 'NO EXPIRY';
 
   return `
-  <article class="bg-panel border ${done ? 'border-volt' : 'border-edge'} rounded-2xl p-5 rise">
-    <div class="flex items-start justify-between gap-3 mb-1">
-      <h3 class="font-black text-base">${escapeHtml(c.title)}</h3>
-      <span class="shrink-0 text-[11px] text-zinc-400 bg-ink border border-edge rounded-full px-2.5 py-1">${joinedCount} joined</span>
+  <article class="bg-panel border ${done ? 'border-volt' : 'border-zinc-800'} p-5 rise">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="font-display uppercase font-semibold text-lg leading-tight">${escapeHtml(c.title)}</h3>
+      <span class="shrink-0 text-[9px] tracking-[0.2em] text-zinc-400 bg-ink border border-zinc-800 px-2 py-1 uppercase whitespace-nowrap">${joinedCount} IN</span>
     </div>
-    <p class="text-sm text-zinc-400 mb-4">${escapeHtml(c.description)}</p>
+    <p class="text-xs text-zinc-400 mb-5 leading-relaxed normal-case">${escapeHtml(c.description)}</p>
 
     ${
       mine
         ? `
-      <div class="mb-1.5 flex justify-between text-xs font-bold">
-        <span class="${done ? 'text-volt' : 'text-zinc-300'}">${done ? 'COMPLETE! 🎉' : `${progress} / ${c.target_workouts} workouts`}</span>
+      <div class="mb-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em]">
+        <span class="${done ? 'text-volt' : 'text-zinc-300'}">${done ? 'TARGET HIT' : `${progress} / ${c.target_workouts} SESSIONS`}</span>
         <span class="text-zinc-500">${pct}%</span>
       </div>
-      <div class="h-3 bg-ink rounded-full overflow-hidden border border-edge">
-        <div class="h-full ${done ? 'bg-volt' : 'bg-gradient-to-r from-emerald-600 to-volt'} rounded-full transition-all duration-500" style="width:${pct}%"></div>
+      <div class="h-2 bg-ink border border-zinc-800">
+        <div class="h-full ${done ? 'bg-volt' : 'bg-volt/70'} transition-all duration-500" style="width:${pct}%"></div>
       </div>`
         : `
       <button data-join="${c.id}"
-        class="w-full bg-volt text-ink font-black py-3 rounded-xl text-sm active:scale-[0.98] transition-transform">
-        JOIN CHALLENGE
+        class="w-full bg-volt text-ink font-display uppercase font-bold tracking-[0.25em] text-sm py-4 active:translate-y-0.5 active:bg-white transition duration-75">
+        ACCEPT MISSION
       </button>`
     }
-    <p class="text-[11px] text-zinc-600 mt-3">${endLine}</p>
+    <p class="text-[9px] text-zinc-600 mt-3 tracking-[0.25em] uppercase">${endLine}</p>
   </article>`;
 }
 
@@ -590,14 +596,14 @@ async function joinChallenge(challengeId) {
 
   if (error) {
     if (error.code === '23505') {
-      toast('You already joined this one.');
+      toast('ALREADY ENROLLED.');
       loadChallenges();
     } else {
-      toast('Could not join: ' + error.message);
+      toast('ENROL FAILED — ' + error.message);
     }
     return;
   }
-  toast('Challenge joined! Time to grind 🔥');
+  toast('MISSION ACCEPTED.');
   loadChallenges();
 }
 

@@ -9,6 +9,7 @@ A mobile-first, community workout tracker: email auth, workout logging, weekly c
 | `index.html` | Single-page app UI (auth, profile setup, log/leaderboard/challenges/profile tabs) |
 | `script.js` | All application logic (Supabase auth, queries, realtime, rendering) |
 | `schema.sql` | Complete database schema + RLS policies + leaderboard RPC + seed challenges |
+| `check-connection.js` | Dev utility — pings your Supabase project (auth health, table/RLS/RPC checks). Do not deploy. |
 
 ## 1. Create the Supabase backend (~5 minutes)
 
@@ -48,6 +49,7 @@ The anon key is safe to ship in client code — all data access is gated by the 
 - **workouts** — insert/delete restricted to `auth.uid() = user_id`; select open to authenticated users so the weekly leaderboard can aggregate. No anonymous (anon) role can touch any table.
 - **challenge_participants** — each user can only insert their own membership; duplicate joins blocked by a unique constraint.
 - **challenges** — read-only for authenticated users; managed from the Supabase dashboard.
+- **`get_weekly_leaderboard()`** — EXECUTE revoked from `public` and `anon` (Postgres grants it to PUBLIC by default), granted only to `authenticated`. Anonymous visitors cannot call the RPC or harvest display names.
 
 ## Data flow notes
 
@@ -69,4 +71,15 @@ python -m http.server 8080
 
 Then open `http://localhost:8080`.
 
-**Preview without a backend:** `mock-supabase.js` + `test-mock.html` are a throwaway test harness that fakes the Supabase client with sample data. Open `http://localhost:8080/test-mock.html` to click through every screen before wiring up real credentials. Do not deploy `test-mock.html` or `mock-supabase.js` — they are not part of the app.
+**Preview without a backend:** `mock-supabase.js` + `test-mock.html` are a throwaway test harness that fakes the Supabase client with sample data. Open `http://localhost:8080/test-mock.html` to click through every screen before wiring up real credentials. Do not deploy `test-mock.html`, `mock-supabase.js`, or `check-connection.js` — they are not part of the app.
+
+## Launch checklist
+
+- **Email confirmation**: Supabase's free tier sends only a few confirmation emails per hour (signups fail with `429 over_email_send_rate_limit` once exhausted). Either turn off *Authentication → Providers → Email → Confirm email* for the MVP, or add custom SMTP under *Authentication → Emails → SMTP* before inviting 200 users.
+- **RPC lockdown**: if you ran an older copy of `schema.sql`, make sure this fix was applied in the SQL editor:
+  ```sql
+  revoke execute on function public.get_weekly_leaderboard() from public;
+  revoke execute on function public.get_weekly_leaderboard() from anon;
+  grant execute on function public.get_weekly_leaderboard() to authenticated;
+  ```
+- **Connectivity check**: `node check-connection.js` verifies auth health, table existence, RLS enforcement, and the leaderboard RPC at any time.

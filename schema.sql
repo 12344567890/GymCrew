@@ -178,7 +178,10 @@ as $$
   order by total_workouts desc, p.display_name asc;
 $$;
 
-revoke all on function public.get_weekly_leaderboard() from anon;
+-- Postgres grants EXECUTE to PUBLIC by default; revoke from public AND anon
+-- so only authenticated users can call it.
+revoke execute on function public.get_weekly_leaderboard() from public;
+revoke execute on function public.get_weekly_leaderboard() from anon;
 grant execute on function public.get_weekly_leaderboard() to authenticated;
 
 -- ---------- 6. SEED COMMUNITY CHALLENGES ----------

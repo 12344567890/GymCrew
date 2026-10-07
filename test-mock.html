@@ -6,7 +6,10 @@
   <meta name="theme-color" content="#0D0D0D" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="GYM CREW — register the work, track the crew, reset the clock." />
   <title>GYM CREW — EVERY REP ON RECORD</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -23,9 +26,13 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     input, select, textarea { font-size: 16px; } /* prevents iOS zoom-on-focus */
     select { appearance: none; -webkit-appearance: none; }
+    input[type="range"] { accent-color: #CCFF00; }
     .nav-safe { padding-bottom: 0; }
     @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .rise { animation: rise 0.18s ease-out both; }
+    /* AMOLED black mode overrides */
+    html.amoled body, html.amoled .bg-ink { background-color: #000 !important; }
+    html.amoled .bg-panel { background-color: #070707 !important; }
   </style>
   <script>
     tailwind.config = {
@@ -51,9 +58,9 @@
   <!-- ==================== ACCESS / ENLIST ==================== -->
   <section id="screen-auth" class="hidden min-h-screen flex flex-col justify-center px-6 py-10 max-w-md mx-auto">
     <div class="mb-12">
-      <p class="text-[10px] tracking-[0.4em] text-zinc-600 uppercase mb-3">/// Performance Logbook</p>
+      <p class="text-[12px] tracking-[0.4em] text-zinc-400 uppercase mb-3">/// Performance Logbook</p>
       <h1 class="font-display font-bold uppercase text-6xl leading-none tracking-tight">GYM<span class="text-volt">/</span>CREW</h1>
-      <p class="text-[11px] tracking-[0.35em] text-zinc-500 uppercase mt-3">Every rep on record</p>
+      <p class="text-[11px] tracking-[0.35em] text-zinc-400 uppercase mt-3">Every rep on record</p>
     </div>
 
     <div class="border border-zinc-800 bg-panel">
@@ -65,12 +72,12 @@
       <form id="auth-form" class="p-6 space-y-6" novalidate>
         <div id="signup-only" class="hidden space-y-6">
           <div>
-            <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Callsign</label>
+            <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Callsign</label>
             <input id="signup-name" type="text" placeholder="WHAT THEY CALL YOU" autocomplete="nickname"
-              class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-700 uppercase tracking-wider" />
+              class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 uppercase tracking-wider" />
           </div>
           <div>
-            <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Primary objective</label>
+            <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Primary objective</label>
             <select id="signup-goal"
               class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm uppercase tracking-wider">
               <option class="bg-panel">General Fitness</option>
@@ -82,14 +89,14 @@
           </div>
         </div>
         <div>
-          <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Email</label>
+          <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Email</label>
           <input id="auth-email" type="email" placeholder="YOU@DOMAIN.COM" autocomplete="email" required
-            class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-700 tracking-wider" />
+            class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 tracking-wider" />
         </div>
         <div>
-          <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Password</label>
+          <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Password</label>
           <input id="auth-password" type="password" placeholder="MIN 6 CHARACTERS" autocomplete="current-password" required minlength="6"
-            class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-700 tracking-wider" />
+            class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 tracking-wider" />
         </div>
         <p id="auth-error" class="hidden text-[11px] text-red-400 border-l-2 border-red-400 pl-3 py-1 uppercase tracking-wider"></p>
         <button id="auth-submit" type="submit"
@@ -98,29 +105,29 @@
         </button>
       </form>
     </div>
-    <p class="text-[10px] tracking-[0.3em] text-zinc-700 uppercase mt-10 text-center">Show up. Stack days.</p>
+    <p class="text-[12px] tracking-[0.3em] text-zinc-400 uppercase mt-10 text-center">Show up. Stack days.</p>
   </section>
 
   <!-- ==================== OPERATOR SETUP ==================== -->
   <section id="screen-setup" class="hidden min-h-screen flex flex-col justify-center px-6 py-10 max-w-md mx-auto">
     <div class="mb-10">
-      <p class="text-[10px] tracking-[0.4em] text-zinc-600 uppercase mb-3">/// Intake Form</p>
+      <p class="text-[12px] tracking-[0.4em] text-zinc-400 uppercase mb-3">/// Intake Form</p>
       <h2 class="font-display font-bold uppercase text-4xl leading-none tracking-tight">OPERATOR<br/>SETUP<span class="text-volt">_</span></h2>
-      <p class="text-[11px] tracking-[0.25em] text-zinc-500 uppercase mt-3">Your name goes on the board.</p>
+      <p class="text-[11px] tracking-[0.25em] text-zinc-400 uppercase mt-3">Your name goes on the board.</p>
     </div>
 
     <form id="setup-form" class="space-y-8" novalidate>
       <div>
-        <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-2">Pick your mark</label>
+        <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-2">Pick your mark</label>
         <div id="avatar-picker" class="grid grid-cols-6 gap-1.5"></div>
       </div>
       <div>
-        <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Callsign</label>
+        <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Callsign</label>
         <input id="setup-name" type="text" maxlength="30" required
           class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm uppercase tracking-wider" />
       </div>
       <div>
-        <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Primary objective</label>
+        <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Primary objective</label>
         <select id="setup-goal"
           class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm uppercase tracking-wider">
           <option class="bg-panel">General Fitness</option>
@@ -144,7 +151,7 @@
     <header class="sticky top-0 z-40 bg-ink/95 backdrop-blur border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
       <h1 class="font-display font-bold uppercase tracking-tight text-lg leading-none">GYM<span class="text-volt">/</span>CREW</h1>
       <div class="flex items-center gap-3">
-        <span id="week-counter" class="border border-zinc-800 px-2 py-1 text-[9px] tracking-[0.25em] uppercase text-zinc-400"></span>
+        <span id="week-counter" class="border border-zinc-800 px-2 py-1 text-[11px] tracking-[0.25em] uppercase text-zinc-400"></span>
         <span id="header-avatar" class="text-lg"></span>
       </div>
     </header>
@@ -152,134 +159,454 @@
     <main class="max-w-md mx-auto px-4 pt-5 pb-24">
 
       <!-- ========== 01 STATUS ========== -->
-      <section id="tab-dashboard">
-        <form id="log-form" class="border border-zinc-800 bg-panel p-5 mb-8">
-          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-5 flex items-center gap-2">
-            <span class="w-2 h-2 bg-volt inline-block"></span> REGISTER WORK
-          </h2>
-          <div class="space-y-6">
+      <section id="tab-status">
+        <div id="quest-card" class="hidden border border-volt bg-volt/5 p-4 mb-4">
+          <div class="flex items-center justify-between">
+            <p class="text-[10px] tracking-[0.3em] uppercase text-volt">/// Daily quest — +25 XP</p>
+            <span id="quest-state" class="text-[10px] tracking-[0.2em] uppercase"></span>
+          </div>
+          <p id="quest-text" class="font-display uppercase font-semibold text-lg mt-2 leading-tight"></p>
+          <p id="quest-progress" class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mt-1.5"></p>
+        </div>
+
+        <p id="crew-stat-line" class="text-[12px] tracking-[0.25em] uppercase text-zinc-400 border-l-2 border-volt pl-3 mb-5"></p>
+
+        <form id="reg-form" class="border border-zinc-800 bg-panel p-5 mb-4">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-display uppercase font-semibold tracking-widest text-base flex items-center gap-2">
+              <span class="w-2 h-2 bg-volt inline-block"></span> REGISTER WORK
+            </h2>
+            <span id="dur-chip" class="text-[11px] tracking-[0.2em] text-zinc-400 border border-zinc-800 px-2 py-1 uppercase">00:00</span>
+          </div>
+
+          <div class="space-y-5">
             <div>
-              <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Movement</label>
-              <input id="log-exercise" type="text" placeholder="BENCH PRESS / 5KM RUN /…" maxlength="80" required
-                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-700 uppercase tracking-wider" />
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">What did you do?</label>
+              <input id="reg-entry" type="text" maxlength="80" required autocomplete="off"
+                placeholder="HEAVY CHEST DAY — 4 FLAT BENCH SETS, FELT STRONG"
+                class="w-full bg-transparent border-b-2 border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 tracking-wider" />
             </div>
-            <div class="grid grid-cols-3 gap-4">
-              <div>
-                <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">KG</label>
-                <input id="log-weight" type="number" inputmode="decimal" min="0" step="0.5" placeholder="—"
-                  class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm text-center placeholder-zinc-700" />
-              </div>
-              <div>
-                <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Reps</label>
-                <input id="log-reps" type="number" inputmode="numeric" min="0" placeholder="—"
-                  class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm text-center placeholder-zinc-700" />
-              </div>
-              <div>
-                <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Sets</label>
-                <input id="log-sets" type="number" inputmode="numeric" min="0" placeholder="—"
-                  class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm text-center placeholder-zinc-700" />
-              </div>
-            </div>
+
             <div>
-              <label class="block text-[9px] tracking-[0.3em] uppercase text-zinc-500 mb-1">Field notes</label>
-              <textarea id="log-notes" rows="2" maxlength="500" placeholder="DISTANCE. PRS. EXCUSES YOU DON'T HAVE."
-                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-700 resize-none uppercase tracking-wider"></textarea>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-2">Flags</label>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" data-tag="DROP SET" class="tag-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Drop set</button>
+                <button type="button" data-tag="SUPERSET" class="tag-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Superset</button>
+                <button type="button" data-tag="PR" class="tag-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">PR</button>
+              </div>
             </div>
-            <p id="log-error" class="hidden text-[11px] text-red-400 border-l-2 border-red-400 pl-3 py-1 uppercase tracking-wider"></p>
-            <button type="submit" id="log-submit"
+
+            <button type="button" id="endurance-toggle"
+              class="w-full border border-zinc-800 text-left px-3 py-2.5 text-[12px] tracking-[0.25em] uppercase text-zinc-400 flex items-center justify-between">
+              <span>＋ Distance block — run / ride / row</span>
+              <span id="endurance-caret" class="text-volt">＋</span>
+            </button>
+            <div id="endurance-fields" class="hidden space-y-4 border border-zinc-800 p-3">
+              <div class="grid grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-1">KM</label>
+                  <input id="reg-distance" type="number" inputmode="decimal" min="0" step="0.1" placeholder="—"
+                    class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm text-center placeholder-zinc-500" />
+                </div>
+                <div>
+                  <label class="block text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-1">Elev m</label>
+                  <input id="reg-elev" type="number" inputmode="numeric" min="0" placeholder="—"
+                    class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm text-center placeholder-zinc-500" />
+                </div>
+                <div>
+                  <label class="block text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-1">Move min</label>
+                  <input id="reg-moving" type="number" inputmode="numeric" min="0" placeholder="—"
+                    class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm text-center placeholder-zinc-500" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-1">Gear used</label>
+                <select id="reg-gear"
+                  class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm uppercase tracking-wider">
+                  <option class="bg-panel" value="">NONE</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-2">
+                Effort — RPE <span id="rpe-val" class="text-volt font-bold">—</span>
+              </label>
+              <input id="rpe-slider" type="range" min="1" max="10" step="1" value="5" class="w-full" />
+              <div class="flex justify-between text-[10px] text-zinc-400 tracking-widest mt-1"><span>1 EASY</span><span>10 FAILURE</span></div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-2">Fatigue map — where does it hurt?</label>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" data-fatigue="CHEST" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Chest</button>
+                <button type="button" data-fatigue="BACK" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Back</button>
+                <button type="button" data-fatigue="LEGS" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Legs</button>
+                <button type="button" data-fatigue="SHOULDERS" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Shoulders</button>
+                <button type="button" data-fatigue="ARMS" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Arms</button>
+                <button type="button" data-fatigue="CALVES" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-zinc-700 text-zinc-400 px-2.5 py-1.5">Calves</button>
+                <button type="button" data-fatigue="WRECKED" class="fatigue-chip text-[11px] tracking-[0.2em] uppercase border border-red-900 text-red-400 px-2.5 py-1.5">Wrecked</button>
+              </div>
+            </div>
+
+            <p id="reg-error" class="hidden text-[11px] text-red-400 border-l-2 border-red-400 pl-3 py-1 uppercase tracking-wider"></p>
+            <button type="submit" id="reg-submit"
               class="w-full bg-volt text-ink font-display uppercase font-bold tracking-[0.25em] text-sm py-4 active:translate-y-0.5 active:bg-white transition duration-75">
               REGISTER SESSION
             </button>
           </div>
         </form>
 
-        <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-4 flex items-center gap-2">
-          <span class="w-2 h-2 bg-volt inline-block"></span> PAIN LOG
-        </h2>
-        <div id="history-list" class="space-y-2"></div>
+        <!-- Plate math -->
+        <div class="border border-zinc-800 bg-panel p-5 mb-8">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-4 flex items-center gap-2">
+            <span class="w-2 h-2 bg-volt inline-block"></span> PLATE MATH
+          </h2>
+          <div class="flex items-end gap-3">
+            <div class="flex-1">
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Target weight — 20KG bar</label>
+              <input id="plate-target" type="number" inputmode="decimal" min="0" step="2.5" value="100"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm" />
+            </div>
+            <span class="text-[11px] text-zinc-400 tracking-widest uppercase pb-2">KG</span>
+          </div>
+          <p id="plate-out" class="text-xs text-zinc-300 tracking-wider mt-4 min-h-[1.5rem]"></p>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base flex items-center gap-2">
+            <span class="w-2 h-2 bg-volt inline-block"></span> THE STREAK
+          </h2>
+          <button type="button" id="drop-score-btn"
+            class="bg-volt text-ink text-[11px] font-bold tracking-[0.2em] uppercase px-3 py-2 active:translate-y-0.5 active:bg-white transition duration-75">
+            Drop score →
+          </button>
+        </div>
+        <p id="streak-summary" class="text-[12px] tracking-[0.25em] uppercase text-zinc-400 mb-3"></p>
+        <div id="streak-list" class="space-y-2"></div>
       </section>
 
       <!-- ========== 02 THE CREW ========== -->
-      <section id="tab-leaderboard" class="hidden">
+      <section id="tab-crew" class="hidden">
+        <div class="border border-zinc-800 bg-panel px-5 py-4 mb-3 grid grid-cols-3 text-center">
+          <div>
+            <p id="crew-today" class="font-display font-bold text-2xl text-volt leading-none">0</p>
+            <p class="text-[10px] tracking-[0.25em] text-zinc-400 uppercase mt-1.5">Today</p>
+          </div>
+          <div class="border-x border-zinc-800">
+            <p id="crew-week" class="font-display font-bold text-2xl text-volt leading-none">0</p>
+            <p class="text-[10px] tracking-[0.25em] text-zinc-400 uppercase mt-1.5">This week</p>
+          </div>
+          <div>
+            <p id="crew-active" class="font-display font-bold text-2xl text-volt leading-none">0</p>
+            <p class="text-[10px] tracking-[0.25em] text-zinc-400 uppercase mt-1.5">Active today</p>
+          </div>
+        </div>
+
         <div class="border border-zinc-800 bg-panel px-5 py-4 mb-3 flex items-center justify-between">
           <div>
-            <h2 class="font-display uppercase font-semibold tracking-widest text-base">THE CREW</h2>
-            <p class="text-[9px] tracking-[0.25em] uppercase text-zinc-500 mt-1">Sessions this week — board resets Monday</p>
+            <h2 class="font-display uppercase font-semibold tracking-widest text-base">THE BOARD</h2>
+            <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mt-1">Sessions this week — <span id="board-countdown" class="text-volt"></span></p>
           </div>
-          <span class="text-[8px] tracking-[0.3em] text-volt border border-volt px-1.5 py-1 uppercase">Live</span>
+          <span class="text-[10px] tracking-[0.3em] text-volt border border-volt px-1.5 py-1 uppercase">Live</span>
         </div>
-        <div id="leaderboard-list" class="space-y-2"></div>
+        <div id="leaderboard-list" class="space-y-2 mb-6"></div>
+
+        <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-volt inline-block"></span> PR BOARD
+        </h2>
+        <div id="pr-board-list" class="space-y-2 mb-6"></div>
+
+        <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-volt inline-block"></span> CREW FEED
+        </h2>
+        <div id="notice-block" class="mb-3"></div>
+        <div id="feed-list" class="space-y-3 mb-6"></div>
+
+        <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-red-500 inline-block"></span> SLACKER ALERT
+        </h2>
+        <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-3">Silent for 5+ days. Say something.</p>
+        <div id="slacker-list" class="space-y-2"></div>
       </section>
 
       <!-- ========== 03 MISSIONS ========== -->
-      <section id="tab-challenges" class="hidden">
-        <div class="mb-5">
-          <h2 class="font-display uppercase font-semibold tracking-widest text-base flex items-center gap-2">
+      <section id="tab-missions" class="hidden">
+        <div class="border border-zinc-800 bg-panel p-5 mb-3">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">WEEKLY DISTANCE</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">All logged km — Monday to Sunday</p>
+          <div class="flex justify-between text-[12px] font-bold uppercase tracking-[0.2em] mb-2">
+            <span><span id="vol-now" class="text-volt">0.0</span> / 100 KM</span>
+            <span id="vol-pct" class="text-zinc-400">0%</span>
+          </div>
+          <div class="h-2 bg-ink border border-zinc-800">
+            <div id="vol-bar" class="h-full bg-volt transition-all duration-500" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base flex items-center gap-2 mb-3">
             <span class="w-2 h-2 bg-volt inline-block"></span> OPEN MISSIONS
           </h2>
-          <p class="text-[9px] tracking-[0.25em] uppercase text-zinc-500 mt-1.5">Enrol. Bank sessions. Hit the number.</p>
+          <div id="challenges-list" class="space-y-3"></div>
         </div>
-        <div id="challenges-list" class="space-y-3"></div>
+
+        <div class="border border-zinc-800 bg-panel p-5 mb-6">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">DUELS</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">7-day wager. Most sessions wins. Loser wears the penalty.</p>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Opponent callsign</label>
+              <input id="wager-name" type="text" placeholder="EXACT NAME ON THE BOARD"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 uppercase tracking-wider" />
+            </div>
+            <div>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Penalty for the loser</label>
+              <input id="wager-penalty" type="text" maxlength="80" placeholder="BUYS THE CREW SMOOTHIES"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 uppercase tracking-wider" />
+            </div>
+            <button type="button" id="wager-create"
+              class="w-full bg-volt text-ink font-display uppercase font-bold tracking-[0.25em] text-sm py-3.5 active:translate-y-0.5 active:bg-white transition duration-75">
+              LOCK THE DUEL
+            </button>
+          </div>
+          <div id="wager-list" class="space-y-3 mt-5"></div>
+        </div>
+
+        <div class="border border-zinc-800 bg-panel p-5 mb-6">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">EVENT SIMULATOR</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">Lock a race date. Watch the clock chase you.</p>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Event</label>
+              <input id="event-name" type="text" maxlength="40" placeholder="LOCAL TRIATHLON"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm placeholder-zinc-500 uppercase tracking-wider" />
+            </div>
+            <div>
+              <label class="block text-[11px] tracking-[0.3em] uppercase text-zinc-400 mb-1">Date</label>
+              <input id="event-date" type="date"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-sm" />
+            </div>
+          </div>
+          <button type="button" id="event-save"
+            class="w-full border border-zinc-700 text-zinc-200 text-[12px] font-bold tracking-[0.25em] uppercase py-3 active:translate-y-0.5 active:bg-white active:text-ink transition duration-75">
+            Set countdown
+          </button>
+          <div id="event-out" class="mt-4"></div>
+        </div>
       </section>
 
-      <!-- ========== 04 PROFILE ========== -->
+      <!-- ========== 04 FUEL ========== -->
+      <section id="tab-fuel" class="hidden">
+        <div class="border border-zinc-800 bg-panel p-5 mb-3">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display uppercase font-semibold tracking-widest text-base">HYDRATION</h2>
+            <span class="text-[11px] tracking-[0.2em] text-zinc-400 uppercase"><span id="hydration-count" class="text-volt font-bold">0</span> × 500ML</span>
+          </div>
+          <div id="hydration-grid" class="grid grid-cols-4 gap-2"></div>
+          <p class="text-[10px] tracking-[0.25em] text-zinc-400 uppercase mt-3">Tap to fill — target 4L</p>
+        </div>
+
+        <div class="border border-zinc-800 bg-panel p-5 mb-3">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">SLEEP DEBT REGISTER</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">Log last night. Get your readiness read.</p>
+          <input id="sleep-slider" type="range" min="0" max="12" step="0.5" value="7" class="w-full" />
+          <div class="flex items-center justify-between mt-3">
+            <p class="text-sm"><span id="sleep-val" class="text-volt font-bold text-lg">7.0</span> <span class="text-[11px] tracking-[0.2em] text-zinc-400 uppercase">hours</span></p>
+            <button type="button" id="sleep-log"
+              class="bg-volt text-ink text-[11px] font-bold tracking-[0.2em] uppercase px-3 py-2 active:translate-y-0.5 active:bg-white transition duration-75">
+              Log sleep
+            </button>
+          </div>
+          <div id="sleep-out" class="mt-4"></div>
+        </div>
+
+        <div class="border border-zinc-800 bg-panel p-5">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">BRO-MEAL REGISTRY</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">Pin today's protein hits. Check them off.</p>
+          <div class="flex gap-2 mb-4">
+            <input id="meal-input" type="text" maxlength="80" placeholder="EGGS + RICE / SHAKE / CHICKEN…"
+              class="flex-1 bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2.5 text-sm placeholder-zinc-500 uppercase tracking-wider" />
+            <button type="button" id="meal-add"
+              class="bg-volt text-ink text-[12px] font-bold tracking-[0.2em] uppercase px-4 active:translate-y-0.5 active:bg-white transition duration-75">ADD</button>
+          </div>
+          <div id="meal-list" class="space-y-1.5"></div>
+        </div>
+      </section>
+
+      <!-- ========== 05 PROFILE ========== -->
       <section id="tab-profile" class="hidden">
         <div class="border border-zinc-800 bg-panel p-6 text-center mb-2">
           <div id="profile-avatar" class="text-6xl mb-3"></div>
           <h2 id="profile-name" class="font-display uppercase font-bold text-2xl tracking-wide"></h2>
-          <p id="profile-goal" class="text-[10px] text-volt tracking-[0.3em] uppercase mt-1.5"></p>
-          <p id="profile-email" class="text-[10px] text-zinc-600 mt-2 lowercase"></p>
+          <p id="profile-goal" class="text-[12px] text-volt tracking-[0.3em] uppercase mt-1.5"></p>
+          <p id="profile-email" class="text-[12px] text-zinc-400 mt-2 lowercase"></p>
         </div>
-        <div class="grid grid-cols-2 gap-2 mb-6">
-          <div class="border border-zinc-800 bg-panel p-4 text-center">
-            <p id="stat-total" class="font-display font-bold text-4xl text-volt leading-none">0</p>
-            <p class="text-[8px] tracking-[0.3em] text-zinc-500 uppercase mt-2">Career sessions</p>
+
+        <div class="border border-zinc-800 bg-panel p-5 mb-2">
+          <div class="flex items-center justify-between mb-2">
+            <p id="xp-label" class="text-[12px] tracking-[0.25em] uppercase text-zinc-300"></p>
+            <p id="xp-count" class="text-[11px] tracking-[0.2em] text-zinc-400 uppercase"></p>
           </div>
-          <div class="border border-zinc-800 bg-panel p-4 text-center">
-            <p id="stat-week" class="font-display font-bold text-4xl text-volt leading-none">0</p>
-            <p class="text-[8px] tracking-[0.3em] text-zinc-500 uppercase mt-2">This week</p>
+          <div class="h-2 bg-ink border border-zinc-800">
+            <div id="xp-bar" class="h-full bg-volt transition-all duration-500" style="width:0%"></div>
           </div>
         </div>
-        <button id="btn-refresh-profile"
-          class="w-full border border-zinc-700 text-zinc-200 uppercase tracking-[0.25em] text-[11px] font-bold py-4 active:translate-y-0.5 active:bg-white active:text-ink transition duration-75 mb-2">
-          Edit profile
-        </button>
-        <button id="btn-signout"
-          class="w-full border border-red-900 text-red-400 uppercase tracking-[0.25em] text-[11px] font-bold py-4 active:translate-y-0.5 active:bg-red-500 active:text-ink active:border-red-500 transition duration-75">
-          Sign out
-        </button>
+
+        <div id="badges-row" class="flex flex-wrap gap-1.5 mb-2"></div>
+
+        <div class="grid grid-cols-4 gap-1.5 mb-6">
+          <div class="border border-zinc-800 bg-panel p-3 text-center">
+            <p id="stat-total" class="font-display font-bold text-xl text-volt leading-none">0</p>
+            <p class="text-[9px] tracking-[0.2em] text-zinc-400 uppercase mt-1.5">Career</p>
+          </div>
+          <div class="border border-zinc-800 bg-panel p-3 text-center">
+            <p id="stat-week" class="font-display font-bold text-xl text-volt leading-none">0</p>
+            <p class="text-[9px] tracking-[0.2em] text-zinc-400 uppercase mt-1.5">Week</p>
+          </div>
+          <div class="border border-zinc-800 bg-panel p-3 text-center">
+            <p id="stat-streak" class="font-display font-bold text-xl text-volt leading-none">0</p>
+            <p class="text-[9px] tracking-[0.2em] text-zinc-400 uppercase mt-1.5">Streak</p>
+          </div>
+          <div class="border border-zinc-800 bg-panel p-3 text-center">
+            <p id="stat-prs" class="font-display font-bold text-xl text-volt leading-none">0</p>
+            <p class="text-[9px] tracking-[0.2em] text-zinc-400 uppercase mt-1.5">PRs</p>
+          </div>
+        </div>
+
+        <!-- Gear mileage -->
+        <div class="border border-zinc-800 bg-panel p-5 mb-2">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">GEAR MILEAGE</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">Shoes and bikes — retired at 800km</p>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <div>
+              <label class="block text-[10px] tracking-[0.2em] uppercase text-zinc-400 mb-1">Name</label>
+              <input id="gear-name" type="text" maxlength="40" placeholder="PEGASUS"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-xs placeholder-zinc-500 uppercase tracking-wider" />
+            </div>
+            <div>
+              <label class="block text-[10px] tracking-[0.2em] uppercase text-zinc-400 mb-1">Kind</label>
+              <select id="gear-kind"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-xs uppercase tracking-wider">
+                <option class="bg-panel" value="shoes">Shoes</option>
+                <option class="bg-panel" value="bike">Bike</option>
+                <option class="bg-panel" value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] tracking-[0.2em] uppercase text-zinc-400 mb-1">Start KM</label>
+              <input id="gear-start" type="number" inputmode="decimal" min="0" step="1" placeholder="0"
+                class="w-full bg-transparent border-b border-zinc-700 focus:border-volt outline-none py-2 text-xs text-center placeholder-zinc-500" />
+            </div>
+          </div>
+          <button type="button" id="gear-add"
+            class="w-full border border-zinc-700 text-zinc-200 text-[12px] font-bold tracking-[0.25em] uppercase py-3 active:translate-y-0.5 active:bg-white active:text-ink transition duration-75 mb-3">
+            Add gear
+          </button>
+          <div id="gear-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Share card -->
+        <div class="border border-zinc-800 bg-panel p-5 mb-2">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-1">DIGITAL CREW CARD</h2>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-zinc-400 mb-4">Your stats, rendered. Post it anywhere.</p>
+          <button type="button" id="share-btn"
+            class="w-full bg-volt text-ink font-display uppercase font-bold tracking-[0.25em] text-sm py-3.5 active:translate-y-0.5 active:bg-white transition duration-75 mb-3">
+            Generate card
+          </button>
+          <canvas id="share-canvas" width="720" height="900" class="hidden w-full border border-zinc-800"></canvas>
+        </div>
+
+        <!-- Settings -->
+        <div class="border border-zinc-800 bg-panel p-5">
+          <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-4">SYSTEM</h2>
+          <button id="csv-btn"
+            class="w-full border border-zinc-700 text-zinc-200 uppercase tracking-[0.25em] text-[11px] font-bold py-4 active:translate-y-0.5 active:bg-white active:text-ink transition duration-75 mb-2">
+            Export CSV
+          </button>
+          <button id="amoled-btn"
+            class="w-full border border-zinc-700 text-zinc-200 uppercase tracking-[0.25em] text-[11px] font-bold py-4 active:translate-y-0.5 active:bg-white active:text-ink transition duration-75 mb-2">
+            Amoled black: <span id="amoled-state">OFF</span>
+          </button>
+          <button id="btn-refresh-profile"
+            class="w-full border border-zinc-700 text-zinc-200 uppercase tracking-[0.25em] text-[11px] font-bold py-4 active:translate-y-0.5 active:bg-white active:text-ink transition duration-75 mb-2">
+            Edit profile
+          </button>
+          <button id="btn-signout"
+            class="w-full border border-red-900 text-red-400 uppercase tracking-[0.25em] text-[11px] font-bold py-4 active:translate-y-0.5 active:bg-red-500 active:text-ink active:border-red-500 transition duration-75">
+            Sign out
+          </button>
+        </div>
       </section>
     </main>
 
     <!-- Bottom hardware nav -->
     <nav class="fixed bottom-0 inset-x-0 z-50 bg-panel border-t border-zinc-800 nav-safe">
-      <div class="max-w-md mx-auto grid grid-cols-4">
-        <button data-tab="dashboard" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-500 border-r border-zinc-800">
-          <span class="text-[8px] tracking-[0.3em]">01</span>
-          <span class="text-[10px] font-bold tracking-[0.2em] uppercase">Status</span>
+      <div class="max-w-md mx-auto grid grid-cols-5">
+        <button data-tab="status" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-400 border-r border-zinc-800">
+          <span class="text-[10px] tracking-[0.3em]">01</span>
+          <span class="text-[11px] font-bold tracking-[0.15em] uppercase">Status</span>
         </button>
-        <button data-tab="leaderboard" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-500 border-r border-zinc-800">
-          <span class="text-[8px] tracking-[0.3em]">02</span>
-          <span class="text-[10px] font-bold tracking-[0.2em] uppercase">The Crew</span>
+        <button data-tab="crew" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-400 border-r border-zinc-800">
+          <span class="text-[10px] tracking-[0.3em]">02</span>
+          <span class="text-[11px] font-bold tracking-[0.15em] uppercase">Crew</span>
         </button>
-        <button data-tab="challenges" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-500 border-r border-zinc-800">
-          <span class="text-[8px] tracking-[0.3em]">03</span>
-          <span class="text-[10px] font-bold tracking-[0.2em] uppercase">Missions</span>
+        <button data-tab="missions" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-400 border-r border-zinc-800">
+          <span class="text-[10px] tracking-[0.3em]">03</span>
+          <span class="text-[11px] font-bold tracking-[0.15em] uppercase">Missions</span>
         </button>
-        <button data-tab="profile" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-500">
-          <span class="text-[8px] tracking-[0.3em]">04</span>
-          <span class="text-[10px] font-bold tracking-[0.2em] uppercase">Profile</span>
+        <button data-tab="fuel" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-400 border-r border-zinc-800">
+          <span class="text-[10px] tracking-[0.3em]">04</span>
+          <span class="text-[11px] font-bold tracking-[0.15em] uppercase">Fuel</span>
+        </button>
+        <button data-tab="profile" class="nav-btn flex flex-col items-center justify-center gap-1 py-3 text-zinc-400">
+          <span class="text-[10px] tracking-[0.3em]">05</span>
+          <span class="text-[11px] font-bold tracking-[0.15em] uppercase">Profile</span>
         </button>
       </div>
     </nav>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="hidden fixed top-12 inset-x-0 z-[60] flex justify-center px-6 pointer-events-none">
-    <p id="toast-msg" class="bg-volt text-ink font-bold text-[10px] tracking-[0.25em] uppercase px-5 py-3 rise"></p>
+  <!-- Rest timer overlay -->
+  <div id="rest-overlay" class="hidden fixed inset-0 z-[70] bg-ink/95 backdrop-blur flex flex-col items-center justify-center px-8">
+    <p class="text-[12px] tracking-[0.4em] uppercase text-zinc-400 mb-6">/// Rest clock running</p>
+    <p id="rest-count" class="font-display font-bold text-8xl text-volt leading-none mb-8">120</p>
+    <div class="w-full max-w-xs h-2 bg-panel border border-zinc-800 mb-8">
+      <div id="rest-bar" class="h-full bg-volt transition-all duration-1000 ease-linear" style="width:100%"></div>
+    </div>
+    <div class="grid grid-cols-4 gap-2 w-full max-w-xs mb-6">
+      <button data-sec="60" class="rest-preset border border-zinc-700 text-[12px] tracking-widest uppercase py-2.5 text-zinc-300">60</button>
+      <button data-sec="90" class="rest-preset border border-zinc-700 text-[12px] tracking-widest uppercase py-2.5 text-zinc-300">90</button>
+      <button data-sec="120" class="rest-preset border border-zinc-700 text-[12px] tracking-widest uppercase py-2.5 text-zinc-300">120</button>
+      <button data-sec="180" class="rest-preset border border-zinc-700 text-[12px] tracking-widest uppercase py-2.5 text-zinc-300">180</button>
+    </div>
+    <button id="rest-skip"
+      class="text-[12px] tracking-[0.3em] uppercase text-zinc-400 border border-zinc-800 px-5 py-3 active:translate-y-0.5 transition duration-75">
+      Skip rest
+    </button>
   </div>
 
-  <script src="mock-supabase.js"></script>
-  <script src="script.js" defer></script>
+  <!-- Rank-up moment -->
+  <div id="rankup-overlay" class="hidden fixed inset-0 z-[80] bg-ink/95 backdrop-blur text-center px-8 pt-40">
+    <p class="text-[12px] tracking-[0.4em] uppercase text-zinc-400 mb-5">/// The bar has moved</p>
+    <p class="text-6xl mb-4">⚡</p>
+    <p id="rankup-title" class="font-display font-bold text-5xl text-volt uppercase leading-none"></p>
+    <p class="text-[12px] tracking-[0.25em] uppercase text-zinc-400 mt-5">New rank unlocked. It never gets easier.</p>
+    <button id="rankup-ok"
+      class="mt-10 bg-volt text-ink font-display uppercase font-bold tracking-[0.25em] text-sm px-10 py-4 active:translate-y-0.5 active:bg-white transition duration-75">
+      ACCEPT
+    </button>
+  </div>
+
+  <!-- XP float layer -->
+  <div id="xp-float-layer" class="fixed inset-x-0 top-1/3 z-[65] pointer-events-none flex justify-center"></div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed top-12 inset-x-0 z-[60] flex justify-center px-6 pointer-events-none">
+    <p id="toast-msg" class="bg-volt text-ink font-bold text-[12px] tracking-[0.25em] uppercase px-5 py-3 rise"></p>
+  </div>
+
+  <script src="mock-supabase.js?v=1791383165315"></script>
+  <script src="script.js?v=1791383165315" defer></script>
 </body>
 </html>

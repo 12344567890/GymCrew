@@ -1,85 +1,67 @@
-# Gym Crew — MVP
+# GYM CREW v2 — Performance Logbook
 
-A mobile-first, community workout tracker: email auth, workout logging, weekly crew leaderboard, and community challenges. Built with plain HTML + Tailwind (CDN) + vanilla JS + Supabase (free tier). Zero build step, zero NPM dependencies — deploy anywhere that serves static files.
+A mobile-first PWA for training crews: one-line workout registration, crew leaderboards and feeds, duels, missions, fuel tracking, and gamified streaks. Plain HTML + Tailwind (CDN) + vanilla JS + Supabase (free tier). Zero build step, zero NPM dependencies, R0 hosting.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `index.html` | Single-page app UI (auth, profile setup, log/leaderboard/challenges/profile tabs) |
-| `script.js` | All application logic (Supabase auth, queries, realtime, rendering) |
-| `schema.sql` | Complete database schema + RLS policies + leaderboard RPC + seed challenges |
-| `check-connection.js` | Dev utility — pings your Supabase project (auth health, table/RLS/RPC checks). Do not deploy. |
+| `index.html` | Single-page app — 5 tabs (STATUS / THE CREW / MISSIONS / FUEL / PROFILE) |
+| `download.html` | Public download/install landing page — QR code, native install prompt, per-platform Add-to-Home-Screen steps |
+| `script.js` | All application logic (auth, logging, feeds, gamification, PWA, offline queue) |
+| `schema.sql` | Full database schema, RLS policies, 5 RPC functions, seeds — **idempotent, safe to re-run for upgrades** |
+| `manifest.json` + `sw.js` + `icons/` | PWA package for "Add to Home Screen" |
+| `check-connection.js` | Dev utility — backend health check. Do not deploy. |
+| `mock-supabase.js` + `test-mock.html` | Test harness (fake data, no backend). Do not deploy. |
 
-## 1. Create the Supabase backend (~5 minutes)
+## Feature map (30 items)
 
-1. Go to [supabase.com](https://supabase.com) → **New project** (free tier is fine for 200 users).
-2. Open **SQL Editor** → paste the entire contents of `schema.sql` → **Run**.
-   This creates the `profiles`, `workouts`, `challenges`, and `challenge_participants` tables, enables Row Level Security with the correct policies, creates the `get_weekly_leaderboard()` RPC, auto-creates a profile row on every signup, seeds two community challenges, and adds the tables to the realtime publication.
-3. Go to **Authentication → Providers → Email** and confirm **Email** provider is enabled.
-   - For instant signup during testing, toggle **"Confirm email"** off.
-   - For launch, leave it on — users will get a confirmation email before logging in.
-4. Go to **Project Settings → API** and copy the **Project URL** and the **anon public** key.
+**STATUS** — one-line frictionless entry ("REGISTER WORK"), drop-set/superset/PR quick-tags, RPE 1–10 slider, fatigue mapping, endurance block (km / elevation / moving time / gear), automatic session duration clock, rest timer with vibration + audio on submit, plate-math calculator, "THE STREAK" history with weekly-streak counter, WhatsApp drop-score compiler, anonymized crew header stats.
 
-## 2. Connect the frontend
+**THE CREW** — weekly leaderboard ("THE BOARD"), global PR board, live crew feed with fist-bump reactions and comments, pinned admin notice board, slacker alert (5+ days silent).
 
-Open `script.js` and replace the two values at the top:
+**MISSIONS** — weekly distance volume bar, community challenges with circular progress gauges, 7-day user-vs-user duels with joke penalties, event simulator countdown.
 
-```js
-const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-SUPABASE-ANON-PUBLIC-KEY';
-```
+**FUEL** — hydration quick-tap grid (8 × 500ml), sleep register with readiness score, daily bro-meal checklist.
 
-The anon key is safe to ship in client code — all data access is gated by the RLS policies in `schema.sql`.
+**PROFILE** — XP + rank system (Rookie → Iron Will → Machine → Myth), badges (4AM Sunrise Club, Graveyard Shift, streaks, PRs), gear & shoe mileage counter with retirement warning at 800km, canvas-generated share card (PNG download), CSV export, AMOLED black toggle, offline cache with auto-sync.
 
-## 3. Deploy (R0 / free tier)
+**Retention loop** — a rotating daily quest (+25 XP), variable-reward "crew favor" bonus drops (~1 in 7 sessions), XP float + full-screen rank-up moments, "chain snaps" streak warnings, board-reset countdown, "TRAINING NOW" presence badges, and haptic feedback on every tap. All client-side — no schema changes.
 
-**GitHub Pages (recommended):**
-1. Create a repo, commit these three files, push.
-2. Repo **Settings → Pages** → deploy from `main` branch, root.
-3. App is live at `https://<username>.github.io/<repo>/`.
+## 1. Supabase setup (~5 minutes)
 
-**Render / Railway (static site):**
-- Render: New → Static Site → connect repo → build command *(leave empty)* → publish directory `/`.
-- Railway: New → deploy from repo → service type "Static" (no build command).
+1. [supabase.com](https://supabase.com) → **New project** (free tier handles 200 users).
+2. **SQL Editor** → paste all of `schema.sql` → **Run**. It creates every table, enables RLS with correct policies, creates all 5 RPCs (locked to authenticated callers), auto-creates profiles on signup, seeds two challenges, and enables realtime. Re-running is safe — it migrates older installs in place.
+3. **Authentication → Providers → Email**: turn **"Confirm email" OFF** for instant access (free tier only sends a few emails/hour; add custom SMTP later if you want confirmation).
+4. **Project Settings → API** → copy the **Project URL** and **anon public** key into the constants at the top of `script.js`.
+5. Optional: **Authentication → URL Configuration → Site URL** — set it to your live URL so any auth emails link correctly.
 
-## Security model (already in `schema.sql`)
+## 2. Deploy (R0)
 
-- **profiles** — readable by any authenticated user (the leaderboard needs names); updatable only by the row owner.
-- **workouts** — insert/delete restricted to `auth.uid() = user_id`; select open to authenticated users so the weekly leaderboard can aggregate. No anonymous (anon) role can touch any table.
-- **challenge_participants** — each user can only insert their own membership; duplicate joins blocked by a unique constraint.
-- **challenges** — read-only for authenticated users; managed from the Supabase dashboard.
-- **`get_weekly_leaderboard()`** — EXECUTE revoked from `public` and `anon` (Postgres grants it to PUBLIC by default), granted only to `authenticated`. Anonymous visitors cannot call the RPC or harvest display names.
+**GitHub Pages:** create a public repo → upload `index.html`, `script.js`, `schema.sql`, `README.md`, `manifest.json`, `sw.js`, and the `icons/` folder → Settings → Pages → deploy from `main` root.
 
-## Data flow notes
+**Netlify:** drag the folder onto [app.netlify.com/drop](https://app.netlify.com/drop) — instant URL, free tier.
 
-- **Leaderboard** uses the `get_weekly_leaderboard()` Postgres function (runs server-side, counted from Monday 00:00 UTC) — one RPC call, no heavy client aggregation.
-- **Challenge progress** counts the signed-in user's workouts logged between the later of (challenge start, join date) and the challenge end, against `target_workouts`.
-- **Realtime** — the app subscribes to `workouts` and `challenge_participants` changes, so the leaderboard and challenge counters update live without refresh. (Enabled by the last two lines of `schema.sql`.)
+**Render:** New → Static Site → connect repo → build command *(empty)* → publish directory `/`.
 
-## Managing challenges
+HTTPS is required for the service worker — all three hosts provide it automatically. After first visit on a phone, use the browser menu → **Add to Home Screen** to install the PWA.
 
-Add/edit challenges any time from **Supabase Dashboard → Table Editor → challenges** (e.g. set `is_active = false` to retire one, or insert a new row with a new `target_workouts` and `ends_at`).
+## Security model (in `schema.sql`)
+
+- All tables locked by RLS; the `anon` role can read nothing and write nothing.
+- `workouts`, `profiles`, `challenges`, `challenge_participants`, `comments`, `fist_bumps`, `wagers`, `notice_board` are crew-readable to authenticated users (feeds/leaderboards) — writes are restricted to `auth.uid()` ownership.
+- `gear`, `meals`, `hydration`, `sleep_logs` are strictly private to their owner.
+- All 5 RPC functions run as security-definer aggregates with `EXECUTE` revoked from `public`/`anon` and granted only to `authenticated`.
+- `notice_board` has no insert policy — admins post via the Supabase Table Editor, which bypasses RLS.
+
+## Admin: notice board + challenges
+
+Post announcements: **Table Editor → notice_board → Insert row** (body text, leave `is_pinned` on). Retire a challenge by setting `is_active = false`; add new ones any time.
 
 ## Local testing
-
-Serve the folder over HTTP (Supabase requires `http://localhost`, not `file://`):
 
 ```
 python -m http.server 8080
 ```
 
-Then open `http://localhost:8080`.
-
-**Preview without a backend:** `mock-supabase.js` + `test-mock.html` are a throwaway test harness that fakes the Supabase client with sample data. Open `http://localhost:8080/test-mock.html` to click through every screen before wiring up real credentials. Do not deploy `test-mock.html`, `mock-supabase.js`, or `check-connection.js` — they are not part of the app.
-
-## Launch checklist
-
-- **Email confirmation**: Supabase's free tier sends only a few confirmation emails per hour (signups fail with `429 over_email_send_rate_limit` once exhausted). Either turn off *Authentication → Providers → Email → Confirm email* for the MVP, or add custom SMTP under *Authentication → Emails → SMTP* before inviting 200 users.
-- **RPC lockdown**: if you ran an older copy of `schema.sql`, make sure this fix was applied in the SQL editor:
-  ```sql
-  revoke execute on function public.get_weekly_leaderboard() from public;
-  revoke execute on function public.get_weekly_leaderboard() from anon;
-  grant execute on function public.get_weekly_leaderboard() to authenticated;
-  ```
-- **Connectivity check**: `node check-connection.js` verifies auth health, table existence, RLS enforcement, and the leaderboard RPC at any time.
+Open `http://localhost:8080` for the real app (Supabase requires HTTP, not `file://`). Open `http://localhost:8080/test-mock.html` to click through every screen with fake data and no backend. The service worker only registers over HTTP(S) — it stays off on `file://`.

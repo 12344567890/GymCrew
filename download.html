@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D0D0D" />
+  <meta name="description" content="Download GYM CREW — register the work, track the crew, reset the clock." />
+  <title>GET GYM CREW — DOWNLOAD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { -webkit-tap-highlight-color: transparent; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .rise { animation: rise 0.25s ease-out both; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { ink: '#0D0D0D', panel: '#141414', edge: '#262626', volt: '#CCFF00' },
+          fontFamily: {
+            display: ['Oswald', 'Impact', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'SFMono-Regular', 'Menlo', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-ink text-zinc-100 font-mono min-h-screen antialiased">
+  <main class="max-w-md mx-auto px-5 pt-12 pb-16">
+
+    <!-- Masthead -->
+    <header class="mb-10">
+      <div class="flex items-center gap-4 mb-5">
+        <img src="icons/icon-192.png" alt="GYM CREW icon" class="w-16 h-16 border border-zinc-800" />
+        <div>
+          <h1 class="font-display font-bold uppercase text-4xl leading-none tracking-tight">GYM<span class="text-volt">/</span>CREW</h1>
+          <p class="text-[10px] tracking-[0.35em] text-zinc-400 uppercase mt-1.5">Performance Logbook</p>
+        </div>
+      </div>
+      <p class="text-[11px] leading-relaxed text-zinc-300 normal-case">One line is all it takes. Register the work, feed the streak, put your name on the board. Free. No ads. Your data is yours.</p>
+    </header>
+
+    <!-- Primary actions -->
+    <section class="border border-zinc-800 bg-panel mb-3">
+      <a href="index.html"
+        class="block w-full bg-volt text-ink font-display uppercase font-bold tracking-[0.25em] text-sm text-center py-5 active:translate-y-0.5 active:bg-white transition duration-75">
+        Open the app →
+      </a>
+      <button id="install-btn"
+        class="hidden w-full border-t border-zinc-800 text-volt font-display uppercase font-bold tracking-[0.25em] text-sm py-5 active:translate-y-0.5 active:bg-volt active:text-ink transition duration-75">
+        ⬇ Install on this device
+      </button>
+      <p id="install-hint" class="border-t border-zinc-800 px-5 py-3 text-[10px] tracking-[0.2em] uppercase text-zinc-400 text-center">
+        Add it to your home screen — steps below
+      </p>
+    </section>
+
+    <!-- QR -->
+    <section class="border border-zinc-800 bg-panel p-5 mb-3">
+      <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 bg-volt inline-block"></span> Scan to open
+      </h2>
+      <div class="flex items-center gap-4">
+        <div id="qr-tile" class="shrink-0 bg-zinc-100 p-2.5 w-32 h-32 flex items-center justify-center">
+          <div id="qr-code" class="w-full"></div>
+        </div>
+        <p class="text-[11px] leading-relaxed text-zinc-300 normal-case">Point a crew member's camera here. The app opens straight in their browser — then lock it to their home screen.</p>
+      </div>
+      <p id="qr-error" class="hidden text-[10px] tracking-[0.2em] uppercase text-zinc-500 mt-3">QR unavailable offline — share the link instead.</p>
+    </section>
+
+    <!-- Install steps -->
+    <section class="grid grid-cols-1 gap-3 mb-3">
+      <div id="ios-card" class="border border-zinc-800 bg-panel p-5">
+        <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-3">iPhone — Safari</h2>
+        <ol class="space-y-2 text-[11px] leading-relaxed text-zinc-300 normal-case list-none">
+          <li><span class="text-volt font-bold">01</span> — Tap "Open the app" above.</li>
+          <li><span class="text-volt font-bold">02</span> — Hit the <span class="font-bold">Share</span> button (square with the arrow).</li>
+          <li><span class="text-volt font-bold">03</span> — Scroll, tap <span class="font-bold">Add to Home Screen</span>.</li>
+          <li><span class="text-volt font-bold">04</span> — Tap Add. GYM/CREW now launches full-screen like a native app.</li>
+        </ol>
+      </div>
+      <div id="android-card" class="border border-zinc-800 bg-panel p-5">
+        <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-3">Android — Chrome</h2>
+        <ol class="space-y-2 text-[11px] leading-relaxed text-zinc-300 normal-case list-none">
+          <li><span class="text-volt font-bold">01</span> — Tap "Open the app" above.</li>
+          <li><span class="text-volt font-bold">02</span> — Tap the <span class="font-bold">⋮</span> menu, then <span class="font-bold">Add to Home screen / Install app</span>.</li>
+          <li><span class="text-volt font-bold">03</span> — Confirm. Done — it runs full-screen and works offline.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Feature strip -->
+    <section class="border border-zinc-800 bg-panel p-5 mb-3">
+      <h2 class="font-display uppercase font-semibold tracking-widest text-base mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 bg-volt inline-block"></span> What's inside
+      </h2>
+      <ul class="grid grid-cols-1 gap-2.5 text-[11px] text-zinc-300 normal-case">
+        <li>⚡ <span class="font-bold uppercase tracking-wider">One-line logging</span> — "heavy chest day, felt strong." That's the whole input.</li>
+        <li>🏆 <span class="font-bold uppercase tracking-wider">The Board</span> — weekly crew rankings that reset every Monday.</li>
+        <li>🔥 <span class="font-bold uppercase tracking-wider">Streaks + daily quests</span> — XP, ranks, and a chain you don't want to snap.</li>
+        <li>👊 <span class="font-bold uppercase tracking-wider">Crew feed</span> — fist bumps, comments, PR announcements, slacker alerts.</li>
+        <li>⚔️ <span class="font-bold uppercase tracking-wider">Duels</span> — 7-day wager vs a friend. Loser buys the smoothies.</li>
+        <li>🌙 <span class="font-bold uppercase tracking-wider">Works offline</span> — logs cache on the device and sync when you're back.</li>
+      </ul>
+    </section>
+
+    <footer class="text-center pt-4">
+      <p class="text-[9px] tracking-[0.3em] uppercase text-zinc-500">/// Every rep on record</p>
+    </footer>
+  </main>
+
+  <script>
+    // Native install prompt (Chromium / Android) when the browser offers it.
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('install-btn');
+    const installHint = document.getElementById('install-hint');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.classList.remove('hidden');
+      installHint.classList.add('hidden');
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        installBtn.textContent = '✓ INSTALLED — CHECK YOUR HOME SCREEN';
+        installBtn.disabled = true;
+      }
+      deferredPrompt = null;
+    });
+
+    // Highlight the relevant platform card.
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS) document.getElementById('ios-card').classList.add('border-volt');
+    else document.getElementById('android-card').classList.add('border-volt');
+
+    // QR pointing at the app itself.
+    try {
+      const appUrl = new URL('index.html', window.location.href).href;
+      const qr = qrcode(0, 'M');
+      qr.addData(appUrl);
+      qr.make();
+      document.getElementById('qr-code').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 });
+      const svg = document.querySelector('#qr-code svg');
+      if (svg) { svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%'); }
+    } catch {
+      document.getElementById('qr-tile').classList.add('hidden');
+      document.getElementById('qr-error').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

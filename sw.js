@@ -2,7 +2,7 @@
    Strategy: network-first for pages (so auth/data stay fresh), falling back
    to cache when offline; stale-while-revalidate for static assets. */
 
-const CACHE = 'gym-crew-v3';
+const CACHE = 'gym-crew-v4';
 const SHELL = [
   './',
   './index.html',
@@ -15,8 +15,11 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
+  // Cache each shell file individually — one missing file must not abort the SW.
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then((cache) => Promise.allSettled(SHELL.map((url) => cache.add(url))))
+      .then(() => self.skipWaiting())
   );
 });
 

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Gym Crew — Log. Compete. Conquer.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { overscroll-behavior-y: none; }
+    body {
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input, select, textarea { font-size: 16px; } /* prevents iOS zoom-on-focus */
+    .nav-safe { padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .rise { animation: rise 0.25s ease-out both; }
+    @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.35); } 50% { box-shadow: 0 0 0 8px rgba(34,197,94,0); } }
+    .live-dot { animation: pulse-glow 2s infinite; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#0a0a0f',
+            panel: '#14141c',
+            edge: '#23232f',
+            volt: '#22c55e'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-ink text-zinc-100 font-sans min-h-screen antialiased">
+
+  <!-- ==================== AUTH SCREEN ==================== -->
+  <section id="screen-auth" class="hidden min-h-screen flex flex-col justify-center px-6 py-10 max-w-md mx-auto">
+    <div class="text-center mb-10">
+      <div class="text-6xl mb-4">🏋️</div>
+      <h1 class="text-3xl font-black tracking-tight">GYM <span class="text-volt">CREW</span></h1>
+      <p class="text-zinc-500 mt-2 text-sm">Log. Compete. Conquer.</p>
+    </div>
+
+    <div class="bg-panel border border-edge rounded-2xl p-6">
+      <div class="flex rounded-xl bg-ink p-1 mb-6">
+        <button id="tab-btn-login" class="auth-toggle flex-1 py-2.5 rounded-lg text-sm font-bold bg-volt text-ink transition">Log In</button>
+        <button id="tab-btn-signup" class="auth-toggle flex-1 py-2.5 rounded-lg text-sm font-bold text-zinc-400 transition">Sign Up</button>
+      </div>
+
+      <form id="auth-form" class="space-y-4" novalidate>
+        <div id="signup-only" class="hidden space-y-4">
+          <input id="signup-name" type="text" placeholder="Display name" autocomplete="nickname"
+            class="w-full bg-ink border border-edge rounded-xl px-4 py-3.5 text-base placeholder-zinc-600 focus:outline-none focus:border-volt" />
+          <select id="signup-goal"
+            class="w-full bg-ink border border-edge rounded-xl px-4 py-3.5 text-base text-zinc-200 focus:outline-none focus:border-volt">
+            <option>General Fitness</option>
+            <option>Build Muscle</option>
+            <option>Lose Fat</option>
+            <option>Get Stronger</option>
+            <option>Endurance</option>
+          </select>
+        </div>
+        <input id="auth-email" type="email" placeholder="Email" autocomplete="email" required
+          class="w-full bg-ink border border-edge rounded-xl px-4 py-3.5 text-base placeholder-zinc-600 focus:outline-none focus:border-volt" />
+        <input id="auth-password" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password" required minlength="6"
+          class="w-full bg-ink border border-edge rounded-xl px-4 py-3.5 text-base placeholder-zinc-600 focus:outline-none focus:border-volt" />
+        <p id="auth-error" class="hidden text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2"></p>
+        <button id="auth-submit" type="submit"
+          class="w-full bg-volt text-ink font-black py-3.5 rounded-xl text-base active:scale-[0.98] transition-transform">
+          LOG IN
+        </button>
+      </form>
+    </div>
+    <p class="text-center text-xs text-zinc-600 mt-6">Respect the grind. Show up daily.</p>
+  </section>
+
+  <!-- ==================== PROFILE SETUP SCREEN ==================== -->
+  <section id="screen-setup" class="hidden min-h-screen flex flex-col justify-center px-6 py-10 max-w-md mx-auto">
+    <h2 class="text-2xl font-black mb-1">Set up your <span class="text-volt">profile</span></h2>
+    <p class="text-zinc-500 text-sm mb-8">This is how the crew sees you.</p>
+
+    <form id="setup-form" class="space-y-6" novalidate>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Avatar</label>
+        <div id="avatar-picker" class="grid grid-cols-6 gap-2"></div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Display name</label>
+        <input id="setup-name" type="text" maxlength="30" required
+          class="w-full bg-panel border border-edge rounded-xl px-4 py-3.5 text-base placeholder-zinc-600 focus:outline-none focus:border-volt" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Primary goal</label>
+        <select id="setup-goal"
+          class="w-full bg-panel border border-edge rounded-xl px-4 py-3.5 text-base text-zinc-200 focus:outline-none focus:border-volt">
+          <option>General Fitness</option>
+          <option>Build Muscle</option>
+          <option>Lose Fat</option>
+          <option>Get Stronger</option>
+          <option>Endurance</option>
+        </select>
+      </div>
+      <p id="setup-error" class="hidden text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2"></p>
+      <button type="submit"
+        class="w-full bg-volt text-ink font-black py-4 rounded-xl text-base active:scale-[0.98] transition-transform">
+        ENTER THE GYM →
+      </button>
+    </form>
+  </section>
+
+  <!-- ==================== MAIN APP ==================== -->
+  <div id="screen-app" class="hidden min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-edge px-4 py-3 flex items-center justify-between">
+      <h1 class="text-lg font-black tracking-tight">GYM <span class="text-volt">CREW</span></h1>
+      <div class="flex items-center gap-2 text-xs text-zinc-400">
+        <span id="week-counter" class="bg-panel border border-edge px-3 py-1.5 rounded-full"></span>
+        <span id="header-avatar" class="text-xl"></span>
+      </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-4 pt-4 pb-28">
+
+      <!-- ========== TAB: DASHBOARD (LOG) ========== -->
+      <section id="tab-dashboard">
+        <form id="log-form" class="bg-panel border border-edge rounded-2xl p-5 mb-6">
+          <h2 class="font-black text-base mb-4 flex items-center gap-2">
+            <span class="w-1.5 h-5 bg-volt rounded-full inline-block"></span> LOG A SESSION
+          </h2>
+          <div class="space-y-3">
+            <input id="log-exercise" type="text" placeholder="Exercise (e.g. Bench Press, 5km Run)" maxlength="80" required
+              class="w-full bg-ink border border-edge rounded-xl px-4 py-3.5 text-base placeholder-zinc-600 focus:outline-none focus:border-volt" />
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Weight kg</label>
+                <input id="log-weight" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0"
+                  class="w-full bg-ink border border-edge rounded-xl px-3 py-3 text-base text-center focus:outline-none focus:border-volt" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Reps</label>
+                <input id="log-reps" type="number" inputmode="numeric" min="0" placeholder="0"
+                  class="w-full bg-ink border border-edge rounded-xl px-3 py-3 text-base text-center focus:outline-none focus:border-volt" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Sets</label>
+                <input id="log-sets" type="number" inputmode="numeric" min="0" placeholder="0"
+                  class="w-full bg-ink border border-edge rounded-xl px-3 py-3 text-base text-center focus:outline-none focus:border-volt" />
+              </div>
+            </div>
+            <textarea id="log-notes" rows="2" maxlength="500" placeholder="Notes — distance, feeling, PRs…"
+              class="w-full bg-ink border border-edge rounded-xl px-4 py-3 text-base placeholder-zinc-600 focus:outline-none focus:border-volt resize-none"></textarea>
+            <p id="log-error" class="hidden text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2"></p>
+            <button type="submit" id="log-submit"
+              class="w-full bg-volt text-ink font-black py-3.5 rounded-xl active:scale-[0.98] transition-transform">
+              + LOG IT
+            </button>
+          </div>
+        </form>
+
+        <h2 class="font-black text-base mb-3 flex items-center gap-2">
+          <span class="w-1.5 h-5 bg-volt rounded-full inline-block"></span> HISTORY FEED
+        </h2>
+        <div id="history-list" class="space-y-3"></div>
+      </section>
+
+      <!-- ========== TAB: LEADERBOARD ========== -->
+      <section id="tab-leaderboard" class="hidden">
+        <div class="bg-panel border border-edge rounded-2xl p-5 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="font-black text-base">GYM CREW LEADERBOARD</h2>
+            <p class="text-xs text-zinc-500 mt-1">Workouts logged this week — resets Monday</p>
+          </div>
+          <span class="live-dot w-2.5 h-2.5 rounded-full bg-volt inline-block" title="Live"></span>
+        </div>
+        <div id="leaderboard-list" class="space-y-2"></div>
+      </section>
+
+      <!-- ========== TAB: CHALLENGES ========== -->
+      <section id="tab-challenges" class="hidden">
+        <div class="mb-4">
+          <h2 class="font-black text-base flex items-center gap-2">
+            <span class="w-1.5 h-5 bg-volt rounded-full inline-block"></span> COMMUNITY CHALLENGES
+          </h2>
+          <p class="text-xs text-zinc-500 mt-1">Join the crew. Bank workouts. Hit the milestone.</p>
+        </div>
+        <div id="challenges-list" class="space-y-4"></div>
+      </section>
+
+      <!-- ========== TAB: PROFILE ========== -->
+      <section id="tab-profile" class="hidden">
+        <div class="bg-panel border border-edge rounded-2xl p-6 text-center mb-4">
+          <div id="profile-avatar" class="text-7xl mb-3"></div>
+          <h2 id="profile-name" class="text-xl font-black"></h2>
+          <p id="profile-goal" class="text-sm text-volt font-bold mt-1"></p>
+          <p id="profile-email" class="text-xs text-zinc-500 mt-1"></p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div class="bg-panel border border-edge rounded-2xl p-4 text-center">
+            <p id="stat-total" class="text-3xl font-black text-volt">0</p>
+            <p class="text-xs text-zinc-500 uppercase tracking-wider mt-1">Total workouts</p>
+          </div>
+          <div class="bg-panel border border-edge rounded-2xl p-4 text-center">
+            <p id="stat-week" class="text-3xl font-black text-volt">0</p>
+            <p class="text-xs text-zinc-500 uppercase tracking-wider mt-1">This week</p>
+          </div>
+        </div>
+        <button id="btn-refresh-profile"
+          class="w-full bg-panel border border-edge rounded-xl py-3.5 font-bold text-sm active:scale-[0.98] transition-transform mb-3">
+          EDIT PROFILE
+        </button>
+        <button id="btn-signout"
+          class="w-full bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl py-3.5 font-bold text-sm active:scale-[0.98] transition-transform">
+          SIGN OUT
+        </button>
+      </section>
+    </main>
+
+    <!-- Fixed bottom navigation -->
+    <nav class="fixed bottom-0 inset-x-0 z-50 bg-panel/95 backdrop-blur border-t border-edge nav-safe">
+      <div class="max-w-md mx-auto grid grid-cols-4">
+        <button data-tab="dashboard" class="nav-btn flex flex-col items-center gap-1 pt-3 pb-1.5 text-zinc-500 transition">
+          <span class="text-2xl leading-none">📋</span>
+          <span class="text-[10px] font-bold uppercase tracking-wide">Log</span>
+        </button>
+        <button data-tab="leaderboard" class="nav-btn flex flex-col items-center gap-1 pt-3 pb-1.5 text-zinc-500 transition">
+          <span class="text-2xl leading-none">🏆</span>
+          <span class="text-[10px] font-bold uppercase tracking-wide">Crew</span>
+        </button>
+        <button data-tab="challenges" class="nav-btn flex flex-col items-center gap-1 pt-3 pb-1.5 text-zinc-500 transition">
+          <span class="text-2xl leading-none">🔥</span>
+          <span class="text-[10px] font-bold uppercase tracking-wide">Challenges</span>
+        </button>
+        <button data-tab="profile" class="nav-btn flex flex-col items-center gap-1 pt-3 pb-1.5 text-zinc-500 transition">
+          <span class="text-2xl leading-none">👤</span>
+          <span class="text-[10px] font-bold uppercase tracking-wide">Profile</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed top-14 inset-x-0 z-[60] flex justify-center px-6 pointer-events-none">
+    <p id="toast-msg" class="bg-volt text-ink font-bold text-sm px-5 py-2.5 rounded-full shadow-lg rise"></p>
+  </div>
+
+  <script src="mock-supabase.js"></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
